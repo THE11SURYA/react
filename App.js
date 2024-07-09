@@ -1,9 +1,8 @@
-
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {View,Text,TextInput,FlatList,Image,StyleSheet,ActivityIndicator,TouchableOpacity} from 'react-native';
+import { View, Text, TextInput, FlatList, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 
 const Stack = createStackNavigator();
 
@@ -13,25 +12,26 @@ const ProductListScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [error, setError] = useState(null);
- const api='https://dummy-json-api.com/products'
+  //const api = 'https://dummy-json-api.com/products';
+
   useEffect(() => {
-    fetch(api)
-    .then((response) => response.json())
+    fetch('https://dummy-json-api.com/products')
+      .then((response) => response.json())
       .then((data) => {
-        setProducts(data);
-        setFilteredProducts(data);
+        setProducts(data.products);
+        setFilteredProducts(data.products);
         setLoading(false);
       })
       .catch((error) => {
         setError(error);
         setLoading(false);
       });
-  }, [api]);
+  }, []);
 
-  const Search = (text) => {
+  const handleSearch = (text) => {
     setSearch(text);
     const filtered = products.filter((product) =>
-      product.name.toLowerCase().includes(text.toLowerCase())
+      product.title.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredProducts(filtered);
   };
@@ -48,9 +48,9 @@ const ProductListScreen = ({ navigation }) => {
     <View style={styles.container}>
       <TextInput
         style={styles.searchBar}
-        placeholder="enter item to search "
+        placeholder="Enter item to search"
         value={search}
-        onChangeText={Search}
+        onChangeText={handleSearch}
       />
       <FlatList
         data={filteredProducts}
@@ -60,9 +60,9 @@ const ProductListScreen = ({ navigation }) => {
             style={styles.productItem}
             onPress={() => navigation.navigate('Product Detail', { product: item })}
           >
-            <Image source={{ uri: item.image }} style={styles.productImage} />
+            <Image source={{ uri: item.thumbnail }} style={styles.productImage} />
             <View>
-              <Text style={styles.productName}>{item.name}</Text>
+              <Text style={styles.productName}>{item.title}</Text>
               <Text style={styles.productPrice}>${item.price}</Text>
             </View>
           </TouchableOpacity>
@@ -74,13 +74,12 @@ const ProductListScreen = ({ navigation }) => {
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
-//here I assume that the APi will have the image for product  
   return (
     <View style={styles.container}>
-      <Image source={{ uri: product.image }} style={styles.productImage} />
-      <Text style={styles.productName}>{product.name}</Text>
+      <Image source={{ uri: product.thumbnail }} style={styles.productImageLarge} />
+      <Text style={styles.productName}>{product.title}</Text>
       <Text style={styles.productPrice}>${product.price}</Text>
-      <Text style={styles.availability}>${product.availability}</Text>
+      
       <Text>{product.description}</Text>
     </View>
   );
@@ -111,7 +110,6 @@ const styles = StyleSheet.create({
   productItem: {
     flexDirection: 'row',
     padding: 10,
-
   },
   productImage: {
     width: 50,
@@ -125,20 +123,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgb(0,100,100)',
   },
-  availability:{
-    fontSize: 16,
-    color: 'rgb(0,100,100)'
-  },
-  productImage: {
+  
+  productImageLarge: {
     width: 200,
     height: 200,
     marginBottom: 10,
   },
-  productName: {
+  productNameLarge: {
     fontSize: 24,
     marginBottom: 10,
   },
-  productPrice: {
+  productPriceLarge: {
     fontSize: 20,
     color: 'gray',
     marginBottom: 10,
